@@ -42,6 +42,7 @@ const {
   GoogleSearchAPI,
   // Structured Tools
   DALLE3,
+  WjImage,
   FluxAPI,
   OpenWeather,
   StructuredSD,
@@ -219,7 +220,33 @@ const loadTools = async ({
     tavily_search_results_json: TavilySearchResults,
   };
 
+  /** @type {ImageGenOptions} */
+  const imageGenOptions = {
+    isAgent: !!agent,
+    req: options.req,
+    fileStrategy,
+    processFileURL: options.processFileURL,
+    returnMetadata: options.returnMetadata,
+    uploadImageBuffer: options.uploadImageBuffer,
+  };
+
   const customConstructors = {
+    wj_image: async (_toolContextMap, dynamicToolContextMap) => {
+      const imageFiles = options.tool_resources?.[EToolResources.image_edit]?.files ?? [];
+      const toolContext = buildImageToolContext({
+        imageFiles,
+        toolName: 'wj_image',
+        contextDescription: 'image editing',
+      });
+      if (toolContext) {
+        dynamicToolContextMap.wj_image = toolContext;
+      }
+      return new WjImage({
+        ...imageGenOptions,
+        userId: user,
+        imageFiles,
+      });
+    },
     image_gen_oai: async (_toolContextMap, dynamicToolContextMap) => {
       const authFields = getAuthFields('image_gen_oai');
       const authValues = await loadAuthValues({ userId: user, authFields });
@@ -276,16 +303,6 @@ const loadTools = async ({
   if (functions === true) {
     toolConstructors.dalle = DALLE3;
   }
-
-  /** @type {ImageGenOptions} */
-  const imageGenOptions = {
-    isAgent: !!agent,
-    req: options.req,
-    fileStrategy,
-    processFileURL: options.processFileURL,
-    returnMetadata: options.returnMetadata,
-    uploadImageBuffer: options.uploadImageBuffer,
-  };
 
   const toolOptions = {
     flux: imageGenOptions,

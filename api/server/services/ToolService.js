@@ -131,7 +131,9 @@ const getActiveToolResources = (toolResources, tools) => {
     activeResources[EToolResources.file_search] = toolResources[EToolResources.file_search];
   }
   if (
-    (tools.includes('image_gen_oai') || tools.includes('gemini_image_gen')) &&
+    (tools.includes('image_gen_oai') ||
+      tools.includes('gemini_image_gen') ||
+      tools.includes('wj_image')) &&
     toolResources[EToolResources.image_edit] != null
   ) {
     activeResources[EToolResources.image_edit] = toolResources[EToolResources.image_edit];
@@ -1478,6 +1480,7 @@ async function loadToolDefinitionsWrapper({
   if (imageFiles.length > 0) {
     const hasOaiImageGen = filteredTools.includes('image_gen_oai');
     const hasGeminiImageGen = filteredTools.includes('gemini_image_gen');
+    const hasWjImage = filteredTools.includes('wj_image');
 
     if (hasOaiImageGen) {
       const toolContext = buildImageToolContext({
@@ -1498,6 +1501,17 @@ async function loadToolDefinitionsWrapper({
       });
       if (toolContext) {
         dynamicToolContextMap.gemini_image_gen = toolContext;
+      }
+    }
+
+    if (hasWjImage) {
+      const toolContext = buildImageToolContext({
+        imageFiles,
+        toolName: 'wj_image',
+        contextDescription: 'image editing',
+      });
+      if (toolContext) {
+        dynamicToolContextMap.wj_image = toolContext;
       }
     }
   }

@@ -327,6 +327,49 @@ export const fileSearchSchema: ExtendedJsonSchema = {
   required: ['query'],
 };
 
+/** WJ Image tool JSON schema */
+export const wjImageSchema: ExtendedJsonSchema = {
+  type: 'object',
+  properties: {
+    prompt: {
+      type: 'string',
+      maxLength: 8000,
+      description: 'WJ `prompt`: text description for image generation.',
+    },
+    model: {
+      type: 'string',
+      enum: ['gpt-image-2', 'nano-banana-2'],
+      description:
+        'WJ `model`. Default gpt-image-2. Pass nano-banana-2 only when the user asks for banana.',
+    },
+    aspect_ratio: {
+      type: 'string',
+      enum: ['1:1', '16:9', '9:16', '4:3', '3:4', '3:2', '2:3'],
+      description: 'WJ `output.aspect_ratio`. Default 1:1.',
+    },
+    resolution: {
+      type: 'string',
+      enum: ['1K', '2K', '4K'],
+      description: 'WJ `output.resolution`. Default 1K for gpt-image-2, 2K for nano-banana-2.',
+    },
+    input_images: {
+      type: 'array',
+      items: { type: 'string' },
+      maxItems: 10,
+      description:
+        'Optional HTTPS or data-URL images for image-to-image. Prefer image_ids for chat uploads.',
+    },
+    image_ids: {
+      type: 'array',
+      items: { type: 'string' },
+      maxItems: 10,
+      description:
+        'LibreChat uploaded/generated image IDs to edit (from tool context). Required for image editing.',
+    },
+  },
+  required: ['prompt'],
+};
+
 /** Tool definitions registry - maps tool names to their definitions */
 export const toolDefinitions: Record<string, ToolRegistryDefinition> = {
   google: {
@@ -351,6 +394,14 @@ export const toolDefinitions: Record<string, ToolRegistryDefinition> = {
       'Use Flux to generate images from text descriptions. This tool can generate images and list available finetunes. Each generate call creates one image. For multiple images, make multiple consecutive calls.',
     schema: fluxApiSchema,
     toolType: 'builtin',
+  },
+  wj_image: {
+    name: 'wj_image',
+    description:
+      'Generate or edit images via WJ. Default model gpt-image-2; pass nano-banana-2 when asked for banana. For editing chat uploads, pass image_ids from the tool context.',
+    schema: wjImageSchema,
+    toolType: 'builtin',
+    responseFormat: 'content_and_artifact',
   },
   open_weather: {
     name: 'open_weather',

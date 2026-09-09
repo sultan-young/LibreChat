@@ -147,6 +147,13 @@
     ]
   },
   {
+    "name": "WJ Image",
+    "pluginKey": "wj_image",
+    "description": "Generate or edit images via WJ. Default: gpt-image-2. Pass image_ids to edit chat uploads.",
+    "icon": "assets/logo.svg",
+    "authConfig": []
+  },
+  {
     "name": "Flux",
     "pluginKey": "flux",
     "description": "Generate images using text with the Flux API.",
