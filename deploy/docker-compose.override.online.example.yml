@@ -1,0 +1,14 @@
+# Online / production override example.
+# Copy to docker-compose.override.yml on the server (do not use build there).
+#
+#   cp deploy/docker-compose.override.online.example.yml docker-compose.override.yml
+#   docker compose pull api
+#   docker compose up -d
+
+services:
+  api:
+    image: sultany/librechat:latest
+    volumes:
+      - type: bind
+        source: ./librechat.yaml
+        target: /app/librechat.yaml
